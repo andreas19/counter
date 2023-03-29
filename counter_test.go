@@ -1,6 +1,9 @@
 package counter
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestNew(t *testing.T) {
 	var tests = []struct {
@@ -13,7 +16,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, test := range tests {
 		c := New(test.args...)
-		if !mapEqual(c.data, test.want) {
+		if !reflect.DeepEqual(c.data, test.want) {
 			t.Errorf("got %v, want %v", c.data, test.want)
 		}
 	}
@@ -28,7 +31,7 @@ func TestSub(t *testing.T) {
 		t.Errorf("got %d, want 0", cnt)
 	}
 	m := map[string]int{"a": 0, "b": -1}
-	if !mapEqual(c.data, m) {
+	if !reflect.DeepEqual(c.data, m) {
 		t.Errorf("got %v, want %v", c.data, m)
 	}
 }
@@ -41,7 +44,7 @@ func TestRemove(t *testing.T) {
 	if ok := c.Remove("b"); ok {
 		t.Errorf("got %v, want false", ok)
 	}
-	if !mapEqual(c.data, map[string]int{}) {
+	if !reflect.DeepEqual(c.data, map[string]int{}) {
 		t.Errorf("got %v, want empty map", c.data)
 	}
 }
@@ -102,7 +105,7 @@ func TestMostCommon(t *testing.T) {
 			if i != 0 && i < len(want) {
 				want = want[:i]
 			}
-			if !sliceEqual(got, want) {
+			if !reflect.DeepEqual(got, want) {
 				t.Errorf("got %v, want %v", got, want)
 			}
 		}
@@ -120,7 +123,7 @@ func TestItems(t *testing.T) {
 	for _, test := range tests {
 		c := New(test.args...)
 		got := c.Items()
-		if !sliceEqual(got, test.want) {
+		if !reflect.DeepEqual(got, test.want) {
 			t.Errorf("got %v, want %v", got, test.want)
 		}
 	}
@@ -129,7 +132,7 @@ func TestItems(t *testing.T) {
 func TestMap(t *testing.T) {
 	c := New("a", "a", "b")
 	want := map[string]int{"a": 2, "b": 1}
-	if m := c.Map(); !mapEqual(m, want) {
+	if m := c.Map(); !reflect.DeepEqual(m, want) {
 		t.Errorf("want %v, got %v", m, want)
 	}
 }
@@ -137,7 +140,7 @@ func TestMap(t *testing.T) {
 func TestClone(t *testing.T) {
 	c := New("a", "a", "b")
 	c2 := c.Clone()
-	if !mapEqual(c.data, c2.data) {
+	if !reflect.DeepEqual(c.data, c2.data) {
 		t.Errorf("want %v, got %v", c.data, c2.data)
 	}
 }
@@ -148,29 +151,4 @@ func TestString(t *testing.T) {
 	if s := c.String(); s != want {
 		t.Errorf("got %q, want %q", s, want)
 	}
-}
-
-func mapEqual(m1, m2 map[string]int) bool {
-	if len(m1) != len(m2) {
-		return false
-	}
-	for k, v1 := range m1 {
-		v2, ok := m2[k]
-		if !ok || (v1 != v2) {
-			return false
-		}
-	}
-	return true
-}
-
-func sliceEqual[T comparable](sl1, sl2 []T) bool {
-	if len(sl1) != len(sl2) {
-		return false
-	}
-	for i, v := range sl1 {
-		if v != sl2[i] {
-			return false
-		}
-	}
-	return true
 }
