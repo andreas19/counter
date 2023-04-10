@@ -99,7 +99,7 @@ func TestMostCommon(t *testing.T) {
 	}
 	for _, test := range tests {
 		c := New(test.args...)
-		for i := -1; i < 5; i++ {
+		for i := 0; i < 5; i++ {
 			got := c.MostCommon(i)
 			want := test.want
 			if i > 0 && i < len(want) {
@@ -110,6 +110,13 @@ func TestMostCommon(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestMostCommonNegN(t *testing.T) {
+	defer func() { _ = recover() }()
+	c := New[string]()
+	c.MostCommon(-1)
+	t.Error("did not panic")
 }
 
 func TestItems(t *testing.T) {

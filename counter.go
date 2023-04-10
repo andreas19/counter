@@ -85,8 +85,12 @@ func (c Counter[T]) Total() int {
 	return total
 }
 
-// MostCommon returns n items orderd by count (descending); n <= 0: all items.
+// MostCommon returns n items orderd by count (descending); n == 0: all items.
+// Panics if n < 0.
 func (c Counter[T]) MostCommon(n int) []ItemCount[T] {
+	if n < 0 {
+		panic("n < 0")
+	}
 	result := make([]ItemCount[T], 0, len(c.data))
 	for k, v := range c.data {
 		result = append(result, ItemCount[T]{Item: k, Count: v})
