@@ -85,14 +85,14 @@ func (c Counter[T]) Total() int {
 	return total
 }
 
-// MostCommon returns n items orderd by count (descending); n == 0: all items.
-func (c Counter[T]) MostCommon(n uint) []ItemCount[T] {
+// MostCommon returns n items orderd by count (descending); n <= 0: all items.
+func (c Counter[T]) MostCommon(n int) []ItemCount[T] {
 	result := make([]ItemCount[T], 0, len(c.data))
 	for k, v := range c.data {
 		result = append(result, ItemCount[T]{Item: k, Count: v})
 	}
 	sort.Slice(result, func(i, j int) bool { return result[i].Count > result[j].Count })
-	if n != 0 && n < uint(len(c.data)) {
+	if n > 0 && n < len(c.data) {
 		result = result[:n]
 	}
 	return result

@@ -99,10 +99,10 @@ func TestMostCommon(t *testing.T) {
 	}
 	for _, test := range tests {
 		c := New(test.args...)
-		for i := 0; i < 5; i++ {
-			got := c.MostCommon(uint(i))
+		for i := -1; i < 5; i++ {
+			got := c.MostCommon(i)
 			want := test.want
-			if i != 0 && i < len(want) {
+			if i > 0 && i < len(want) {
 				want = want[:i]
 			}
 			if !reflect.DeepEqual(got, want) {
