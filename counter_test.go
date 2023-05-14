@@ -136,6 +136,15 @@ func TestItems(t *testing.T) {
 	}
 }
 
+func TestItemsNegCount(t *testing.T) {
+	c := New("a")
+	c.Sub("b")
+	want := []string{"a"}
+	if got := c.Items(); !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v, want %v", got, want)
+	}
+}
+
 func TestMap(t *testing.T) {
 	c := New("a", "a", "b")
 	want := map[string]int{"a": 2, "b": 1}
