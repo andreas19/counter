@@ -14,10 +14,26 @@ func TestNew(t *testing.T) {
 		{[]string{"a"}, map[string]int{"a": 1}},
 		{[]string{"a", "b", "a"}, map[string]int{"a": 2, "b": 1}},
 	}
-	for _, test := range tests {
+	for i, test := range tests {
 		c := New(test.args...)
 		if !reflect.DeepEqual(c.data, test.want) {
-			t.Errorf("got %v, want %v", c.data, test.want)
+			t.Errorf("%d: got %v, want %v", i, c.data, test.want)
+		}
+	}
+}
+
+func TestFromMap(t *testing.T) {
+	var tests = []struct {
+		arg map[string]int
+	}{
+		{map[string]int{}},
+		{map[string]int{"a": 1}},
+		{map[string]int{"a": 2, "b": 1}},
+	}
+	for i, test := range tests {
+		c := FromMap(test.arg)
+		if !reflect.DeepEqual(c.data, test.arg) {
+			t.Errorf("%d: got %v, want %v", i, c.data, test.arg)
 		}
 	}
 }
@@ -25,47 +41,47 @@ func TestNew(t *testing.T) {
 func TestSub(t *testing.T) {
 	c := New("a")
 	if cnt := c.Sub("a"); cnt != 0 {
-		t.Errorf("got %d, want 0", cnt)
+		t.Errorf("1: got %d, want 0", cnt)
 	}
 	if cnt := c.Sub("b"); cnt != -1 {
-		t.Errorf("got %d, want 0", cnt)
+		t.Errorf("2: got %d, want 0", cnt)
 	}
 	m := map[string]int{"a": 0, "b": -1}
 	if !reflect.DeepEqual(c.data, m) {
-		t.Errorf("got %v, want %v", c.data, m)
+		t.Errorf("3: got %v, want %v", c.data, m)
 	}
 }
 
 func TestRemove(t *testing.T) {
 	c := New("a")
 	if ok := c.Remove("a"); !ok {
-		t.Errorf("got %v, want true", ok)
+		t.Errorf("1: got %v, want true", ok)
 	}
 	if ok := c.Remove("b"); ok {
-		t.Errorf("got %v, want false", ok)
+		t.Errorf("2: got %v, want false", ok)
 	}
 	if !reflect.DeepEqual(c.data, map[string]int{}) {
-		t.Errorf("got %v, want empty map", c.data)
+		t.Errorf("3: got %v, want empty map", c.data)
 	}
 }
 
 func TestGet(t *testing.T) {
 	c := New("a", "a")
 	if cnt := c.Get("a"); cnt != 2 {
-		t.Errorf("got %d, want 2", cnt)
+		t.Errorf("1: got %d, want 2", cnt)
 	}
 	if cnt := c.Get("b"); cnt != 0 {
-		t.Errorf("got %d, want 0", cnt)
+		t.Errorf("2: got %d, want 0", cnt)
 	}
 }
 
 func TestContains(t *testing.T) {
 	c := New("a")
 	if ok := c.Contains("a"); !ok {
-		t.Errorf("got %v, want true", ok)
+		t.Errorf("1: got %v, want true", ok)
 	}
 	if ok := c.Contains("b"); ok {
-		t.Errorf("got %v,, want false", ok)
+		t.Errorf("2: got %v,, want false", ok)
 	}
 }
 
@@ -97,26 +113,19 @@ func TestMostCommon(t *testing.T) {
 			},
 		},
 	}
-	for _, test := range tests {
+	for n, test := range tests {
 		c := New(test.args...)
-		for i := 0; i < 5; i++ {
+		for i := -1; i < 5; i++ {
 			got := c.MostCommon(i)
 			want := test.want
 			if i > 0 && i < len(want) {
 				want = want[:i]
 			}
 			if !reflect.DeepEqual(got, want) {
-				t.Errorf("got %v, want %v", got, want)
+				t.Errorf("%d: got %v, want %v", n, got, want)
 			}
 		}
 	}
-}
-
-func TestMostCommonNegN(t *testing.T) {
-	defer func() { _ = recover() }()
-	c := New[string]()
-	c.MostCommon(-1)
-	t.Error("did not panic")
 }
 
 func TestItems(t *testing.T) {
@@ -127,21 +136,12 @@ func TestItems(t *testing.T) {
 		{[]string{}, []string{}},
 		{[]string{"a", "b", "a", "b", "c", "a"}, []string{"a", "a", "a", "b", "b", "c"}},
 	}
-	for _, test := range tests {
+	for i, test := range tests {
 		c := New(test.args...)
 		got := c.Items()
 		if !reflect.DeepEqual(got, test.want) {
-			t.Errorf("got %v, want %v", got, test.want)
+			t.Errorf("%d: got %v, want %v", i, got, test.want)
 		}
-	}
-}
-
-func TestItemsNegCount(t *testing.T) {
-	c := New("a")
-	c.Sub("b")
-	want := []string{"a"}
-	if got := c.Items(); !reflect.DeepEqual(got, want) {
-		t.Errorf("got %v, want %v", got, want)
 	}
 }
 
