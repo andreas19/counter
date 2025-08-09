@@ -1,6 +1,7 @@
 package counter
 
 import (
+	"maps"
 	"reflect"
 	"testing"
 )
@@ -166,5 +167,24 @@ func TestString(t *testing.T) {
 	want := `Counter{Items: 2, Total: 3}`
 	if s := c.String(); s != want {
 		t.Errorf("got %q, want %q", s, want)
+	}
+}
+
+func TestIter(t *testing.T) {
+	var tests = []struct {
+		args []string
+		want map[string]int
+	}{
+		{[]string{}, map[string]int{}},
+		{[]string{"a"}, map[string]int{"a": 1}},
+		{[]string{"a", "b"}, map[string]int{"a": 1, "b": 1}},
+		{[]string{"a", "b", "a"}, map[string]int{"a": 2, "b": 1}},
+	}
+	for i, test := range tests {
+		c := New(test.args...)
+		got := maps.Collect(c.Iter())
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("%d: got %v, want %v", i, got, test.want)
+		}
 	}
 }

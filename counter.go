@@ -3,7 +3,10 @@ package counter
 
 import (
 	"fmt"
+	"iter"
 	"sort"
+
+	"github.com/andreas19/maps"
 )
 
 // An ItemCount contains an item and its count.
@@ -136,4 +139,17 @@ func (c *Counter[T]) Clone() *Counter[T] {
 // String returns a string representation of the Counter.
 func (c *Counter[T]) String() string {
 	return fmt.Sprintf("Counter{Items: %d, Total: %d}", len(c.data), c.Total())
+}
+
+// Iter returns an iterator over item-count pairs. It is sorted in descending order by count.
+func (c *Counter[T]) Iter() iter.Seq2[T, int] {
+	keys := maps.Keys(c.data)
+	sort.Slice(keys, func(i, j int) bool { return c.data[keys[i]] > c.data[keys[j]] })
+	return func(yield func(T, int) bool) {
+		for _, key := range keys {
+			if !yield(key, c.data[key]) {
+				return
+			}
+		}
+	}
 }
